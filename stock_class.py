@@ -1,84 +1,47 @@
-# -*- coding: utf-8 -*-
-"""
-Anthony Franklin
+# Summary: This module contains the class definitions that will be used in the stock analysis program
+# Author: 
+# Date: 
 
-Jul 19th 2024
-"""
+from datetime import datetime
+
+
+# Create Stock class here
 class Stock:
     def __init__(self, symbol, name, shares):
-      self.symbol = symbol
-      self.name = name
-      self.shares = shares
-      self.DataList = [] #List of daily stock data
-      
+        self.symbol = symbol
+        self.name = name
+        self.shares = shares
+        self.DataList = [] # list of daily stock data
+        
     def __str__(self):
-        return f'{self.symbol}, {self.name}, {self.shares}'
-    
+            return f'{self.symbol}, {self.name}, {self.shares}'
+        
     def __repr__(self):
-        return f'{self.symbol}, {self.name}, {self.shares}'
-    
+            return f'{self.symbol}, {self.name}, {self.shares}'
+        
     def add_data(self, stock_data):
-        self.DataList.append(stock_data)
+            self.DataList.append(stock_data)
+
+    @property
+    def name(self):
+        return self._name
+    @name.setter
+   
+    def name(self,name):
+        self._name = name
     
-    # @property 
-    # def symbol(self):
-    #     return self._symbol
-    
-    # @symbol.setter
-    # def symbol(self, symbol):
-    #     raise RuntimeWarning("Cannot Change The Stock's Symbol")
-    
-    # @property
-    # def name(self):
-    #     return self._name
-    # @name.setter
-    # def name(self, name):
-    #     self._name = name
-    
-    # @property
-    # def shares(self):
-    #     return self._shares
-    # @shares.setter
-    # def shares(self, shares):
-    #     raise RuntimeWarning("Use buy() or sell() to change number of shares.")
-    # def buy(self, amount):
-    #     self._shares = self._shares + amount
-    # def sell(self, amount):
-    #     self._shares = self._shares - amount
-        
-    #Add price data
-    def add_data(self, price_data):
-        self.DataList.append(price_data)
-        
+# Create DailyData class here.
 class DailyData:
     def __init__(self, date, close, volume):
-        self.date = date
+        if isinstance(date, str): #Needed to check if "date" being passed is Object or not for the load_data method
+            self.date = datetime.strptime(date, "%m%d%y")  # Adjust format as needed
+        else:
+            self.date = date
         self.close = close
         self.volume = volume
-    
-    # @property 
-    # def date(self):
-    #     return self._date
-    # @date.setter 
-    # def date(self, date):
-    #     self._date = date
-    
-    # @property 
-    # def close(self):
-    #     return self._close
-    # @close.setter 
-    # def close(self, close):
-    #     self._close = close
-        
-    # @property 
-    # def volume(self):
-    #     return self._volume
-    # @volume.setter 
-    # def volume(self, volume):
-    #         self._volume = volume
-            
-        
-myStock = Stock("AAPL", "Apple", 3456)
+
+
+
 
 # Unit Test - Do Not Change Code Below This Line *** *** *** *** *** *** *** *** ***
 # main() is used for unit testing only. It will run when stock_class.py is run.
@@ -99,19 +62,15 @@ def main():
         error_count = error_count+1
         error_list.append("Stock Constructor Error")
     # Test Change Symbol
-    print("Test Change Symbol...",end="")
+    print("Testing Change Symbol...",end="") 
     try:
         testStock.symbol = "NEWTEST"
-        if testStock.symbol == "NEWTEST":
-            print("Successful!")
-        else:
-            print("***ERROR! Symbol change unsuccessful.")
-            error_count = error_count+1
-            error_list.append("Symbol Change Error")
-    except:
-        print("***ERROR! Symbol change failed.")
+        print("***ERROR! Changing stock symbol should not be allowed.")
         error_count = error_count+1
-        error_list.append("Symbol Change Failure")
+        error_list.append("Stock symbol change allowed. Stock symbol changes should not be allowed.")
+    except:
+        print("Successful! - Stock symbol change blocked")
+    # Test Change Name
     print("Test Change Name...",end="")
     try:
         testStock.name = "New Test Company"
@@ -125,28 +84,50 @@ def main():
         print("***ERROR! Name change failed.")
         error_count = error_count+1
         error_list.append("Name Change Failure")
-        print("Test Change Name...",end="")
+    # Test Change Shares
+    print("Test Change Shares...",end="")
     try:
-        testStock.shares = 2000
-        if testStock.shares == 2000:
+        testStock.shares = 200
+        print("***ERROR! Changing stock shares directly should not be allowed.")
+        error_count = error_count+1
+        error_list.append("Stock shares change allowed. Change in shares should be done through buy() or sell().")
+    except:
+        print("Successful! - Stock shares change blocked")
+    # Test Buy and Sell
+    print("Test Buy shares...",end="")
+    try:
+        testStock.buy(50)
+        if testStock.shares == 150:
             print("Successful!")
         else:
-            print("***ERROR! Shares change unsuccessful.")
-            error_count = error_count+1
-            error_list.append("Shares Change Error")
+            print("***ERROR! Buy shares unsuccessful.")
+            error_count = error_count + 1
+            error_list.append("Buy Shares Failure!")
     except:
-        print("***ERROR! Shares change failed.")
-        error_count = error_count+1
-        error_list.append("Shares Change Failure")
-        
+        print("***ERROR! Buy shares failed.")
+        error_count = error_count + 1
+        error_list.append("Buy Shares Failure!")
+    print("Test Sell shares...",end="")
+    try:
+        testStock.sell(25)
+        if testStock.shares == 125:
+            print("Successful!")
+        else:
+            print("***ERROR! Sell shares unsuccessful.")
+            error_count = error_count+1
+            error_list.append("Sell Shares Failure!")
+    except:
+        print("***ERROR! Sell shares failed.")
+        error_count = error_count + 1
+        error_list.append("Sell Shares Failure!")
 
     # Test add daily data
     print("Creating daily stock data...",end="")
     daily_data_error = False
     try:
-        dayData = DailyData("1/1/20",float(14.50),float(100000))
+        dayData = DailyData(datetime.strptime("1/1/20","%m/%d/%y"),float(14.50),float(100000))
         testStock.add_data(dayData)
-        if testStock.DataList[0].date != "1/1/20":
+        if testStock.DataList[0].date != datetime.strptime("1/1/20","%m/%d/%y"):
             error_count = error_count + 1
             daily_data_error = True
             error_list.append("Add Daily Data - Problem with Date")
